@@ -799,7 +799,7 @@
           "properties": {
             "type": {
               "enum": [
-                "+Energy-ThermalZone"
+                "Energy-ThermalZone"
               ]
             },
             "attributes": {
@@ -899,7 +899,7 @@
           "properties": {
             "type": {
               "enum": [
-                "+Energy-ThermalBoundary"
+                "Energy-ThermalBoundary"
               ]
             },
             "attributes": {
@@ -1008,7 +1008,7 @@
           "properties": {
             "type": {
               "enum": [
-                "+Energy-ThermalOpening"
+                "Energy-ThermalOpening"
               ]
             },
             "attributes": {
@@ -1063,7 +1063,7 @@
           "properties": {
             "type": {
               "enum": [
-                "+Energy-UsageZone"
+                "Energy-UsageZone"
               ]
             },
             "attributes": {
@@ -1150,10 +1150,10 @@
           "properties": {
             "type": {
               "enum": [
-                "+Energy-Facilities",
-                "+Energy-DHWFacilities",
-                "+Energy-ElectricalAppliances",
-                "+Energy-LightingFacilities"
+                "Energy-Facilities",
+                "Energy-DHWFacilities",
+                "Energy-ElectricalAppliances",
+                "Energy-LightingFacilities"
               ]
             },
             "attributes": {
@@ -1203,7 +1203,7 @@
           "properties": {
             "type": {
               "enum": [
-                "+Energy-DHWFacilities"
+                "Energy-DHWFacilities"
               ]
             },
             "attributes": {
@@ -1226,7 +1226,7 @@
           "properties": {
             "type": {
               "enum": [
-                "+Energy-ElectricalAppliances"
+                "Energy-ElectricalAppliances"
               ]
             },
             "attributes": {
@@ -1249,7 +1249,7 @@
           "properties": {
             "type": {
               "enum": [
-                "+Energy-LightingFacilities"
+                "Energy-LightingFacilities"
               ]
             },
             "attributes": {
@@ -1268,7 +1268,7 @@
       "properties": {
         "type": {
           "enum": [
-            "+Energy-Occupants"
+            "Energy-Occupants"
           ]
         },
         "attributes": {
@@ -1300,7 +1300,7 @@
           "properties": {
             "type": {
               "enum": [
-                "+Energy-WeatherStation"
+                "Energy-WeatherStation"
               ]
             },
             "attributes": {
@@ -1348,7 +1348,7 @@
       "properties": {
         "type": {
           "enum": [
-            "+Energy-Construction"
+            "Energy-Construction"
           ]
         },
         "attributes": {
@@ -1385,7 +1385,7 @@
       "properties": {
         "type": {
           "enum": [
-            "+Energy-Layer"
+            "Energy-Layer"
           ]
         },
         "attributes": {},
@@ -1407,7 +1407,7 @@
       "properties": {
         "type": {
           "enum": [
-            "+Energy-LayerComponent"
+            "Energy-LayerComponent"
           ]
         },
         "attributes": {
@@ -1437,7 +1437,7 @@
       "properties": {
         "type": {
           "enum": [
-            "+Energy-Gas"
+            "Energy-Gas"
           ]
         },
         "attributes": {
@@ -1462,7 +1462,7 @@
       "properties": {
         "type": {
           "enum": [
-            "+Energy-SolidMaterial"
+            "Energy-SolidMaterial"
           ]
         },
         "attributes": {
@@ -1492,7 +1492,7 @@
       "properties": {
         "type": {
           "enum": [
-            "+Energy-RegularTimeSeries"
+            "Energy-RegularTimeSeries"
           ]
         },
         "attributes": {
@@ -1565,7 +1565,7 @@
       "properties": {
         "type": {
           "enum": [
-            "+Energy-RegularTimeSeriesFile"
+            "Energy-RegularTimeSeriesFile"
           ]
         },
         "attributes": {
@@ -1660,7 +1660,7 @@
       "properties": {
         "type": {
           "enum": [
-            "+Energy-DailyPatternSchedule"
+            "Energy-DailyPatternSchedule"
           ]
         },
         "energy-periodOfYear": {
