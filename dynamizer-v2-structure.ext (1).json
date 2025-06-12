@@ -2,7 +2,7 @@
   "$schema": "https://cityjson.org/schemas/cityjson-extension/1.0.0/CityJSONExtension.schema.json",
   "type": "CityJSONExtension",
   "name": "Dynamizer",
-  "url": "https://github.com/1khawla/CityJSON-Dynamizer/blob/main/dynamizer.ext.json",
+  "url": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext%20(1).json",
   "version": "2.0",
   "versionCityJSON": "2.0",
   "description": "Extension for dynamic attribute modeling based on sensor input and time series",
