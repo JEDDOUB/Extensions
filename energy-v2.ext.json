@@ -1,7 +1,7 @@
 {
   "type": "CityJSONExtension",
   "name": "Energy",
-  "uri": "https://raw.githubusercontent.com/ozgetufan/cjenergy/master/schemas/extensions/energy.ext.json",
+  "uri": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/energy-v2.ext.json",
   "version": "1.1.0",
   "versionCityJSON": "2.0",
   "description": "Extension for storing energy-related data",
