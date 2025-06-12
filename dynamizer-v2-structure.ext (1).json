@@ -2,7 +2,7 @@
   "$schema": "https://cityjson.org/schemas/cityjson-extension/1.0.0/CityJSONExtension.schema.json",
   "type": "CityJSONExtension",
   "name": "Dynamizer",
-  "url": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext%20(1).json",
+  "url": "https://github.com/1khawla/CityJSON-Dynamizer/blob/main/dynamizer.ext.json",
   "version": "2.0",
   "versionCityJSON": "2.0",
   "description": "Extension for dynamic attribute modeling based on sensor input and time series",
@@ -120,30 +120,53 @@
       ]
     }
   },
-  "extraAttributes": {
-    "Building": {
-      "dynamizer": {
-        "type": "object",
-        "properties": {
-          "attributeRef": {
-            "type": "string",
-            "format": "uri-reference"
-          },
-          "startTime": {
-            "$ref": "#/definitions/TM_Position"
-          },
-          "endTime": {
-            "$ref": "#/definitions/TM_Position"
-          },
-          "linkToSensor": {
-            "$ref": "#/definitions/SensorConnection"
-          },
-          "dynamicData": {
-            "$ref": "#/definitions/_AbstractTimeseries"
-          }
+"extraAttributes": {
+  "Building": {
+    "dynamizer": {
+      "type": "object",
+      "properties": {
+        "attributeRef": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "startTime": {
+          "$ref": "#/definitions/TM_Position"
+        },
+        "endTime": {
+          "$ref": "#/definitions/TM_Position"
+        },
+        "linkToSensor": {
+          "$ref": "#/definitions/SensorConnection"
+        },
+        "dynamicData": {
+          "$ref": "#/definitions/_AbstractTimeseries"
         }
       }
     }
+  },
+"GenericCityObject": {
+  "dynamizer": {
+    "type": "object",
+    "properties": {
+      "attributeRef": {
+        "type": "string",
+        "format": "uri-reference"
+      },
+      "startTime": {
+        "$ref": "#/definitions/TM_Position"
+      },
+      "endTime": {
+        "$ref": "#/definitions/TM_Position"
+      },
+      "linkToSensor": {
+        "$ref": "#/definitions/SensorConnection"
+      },
+      "dynamicData": {
+        "$ref": "#/definitions/_AbstractTimeseries"
+      }
+    }
+  }
+}
   },
   "extraCityObjects": {},
   "extraSemanticSurfaces": {},
