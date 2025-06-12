@@ -1,0 +1,151 @@
+{
+  "$schema": "https://cityjson.org/schemas/cityjson-extension/1.0.0/CityJSONExtension.schema.json",
+  "type": "CityJSONExtension",
+  "name": "Dynamizer",
+  "url": "https://github.com/1khawla/CityJSON-Dynamizer/blob/main/dynamizer.ext.json",
+  "version": "2.0",
+  "versionCityJSON": "2.0",
+  "description": "Extension for dynamic attribute modeling based on sensor input and time series",
+  "definitions": {
+    "SensorConnection": {
+      "type": "object",
+      "properties": {
+        "SensorId": {
+          "type": "string"
+        },
+        "serviceType": {
+          "type": "string"
+        },
+        "linkToObservation": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "linkToSensor": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "sensorLocation": {
+          "$ref": "cityobjects.schema.json#/_AbstractCityObject"
+        }
+      }
+    },
+    "dynamicDataDR": {
+      "$ref": "http://www.opengis.net/def/timeseriesType/timeseriesML/TimeseriesDomainRange"
+    },
+    "dynamicDataTVP": {
+      "$ref": "http://www.opengis.net/def/timeseriesType/timeseriesML/TimeseriesTimeValuePair"
+    },
+    "observationData": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    },
+    "AtomicTimeseries": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/dynamicDataDR"
+        },
+        {
+          "$ref": "#/definitions/dynamicDataTVP"
+        },
+        {
+          "$ref": "#/definitions/observationData"
+        }
+      ]
+    },
+    "CompositeTimeseries": {
+      "type": "object",
+      "properties": {
+        "BaseTime": {
+          "type": "string"
+        },
+        "spacing": {
+          "type": "string"
+        }
+      }
+    },
+    "timeseriesComponent": {
+      "type": "object",
+      "properties": {
+        "repetitions": {
+          "type": "integer"
+        },
+        "additionalGap": {
+          "$ref": "http://www.opengis.net/def/objectType/ISO-19108/2002/TM_Period"
+        },
+        "component": {
+          "$ref": "#/definitions/CompositeTimeseries"
+        }
+      }
+    },
+    "_AbstractTimeseries": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/AtomicTimeseries"
+        },
+        {
+          "$ref": "#/definitions/CompositeTimeseries"
+        }
+      ],
+      "properties": {
+        "timeseries": {
+          "$ref": "#/definitions/timeseriesComponent"
+        }
+      }
+    },
+    "TM_Position": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "string",
+          "format": "time"
+        },
+        {
+          "type": "string",
+          "format": "date-time"
+        }
+      ]
+    }
+  },
+  "extraAttributes": {
+    "Building": {
+      "dynamizer": {
+        "type": "object",
+        "properties": {
+          "attributeRef": {
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "startTime": {
+            "$ref": "#/definitions/TM_Position"
+          },
+          "endTime": {
+            "$ref": "#/definitions/TM_Position"
+          },
+          "linkToSensor": {
+            "$ref": "#/definitions/SensorConnection"
+          },
+          "dynamicData": {
+            "$ref": "#/definitions/_AbstractTimeseries"
+          }
+        }
+      }
+    }
+  },
+  "extraCityObjects": {},
+  "extraSemanticSurfaces": {},
+  "extraRootProperties": {}
+}
