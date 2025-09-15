@@ -2,136 +2,103 @@
   "$schema": "https://cityjson.org/schemas/cityjson-extension/1.0.0/CityJSONExtension.schema.json",
   "type": "CityJSONExtension",
   "name": "Dynamizer",
-  "url": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext.json",
+  "url": "https://raw.githubusercontent.com/JEDDOUB/Extensions/main/dynamizer-v2.ext.json",
   "version": "2.0",
   "versionCityJSON": "2.0",
-  "description": "Attach time-series sensor data to attributes of CityObjects (simple observations or composite series).",
-
+  "description": "Attach dynamic time-series sensor data to CityJSON features (simple observations model).",
   "definitions": {
+    "TM_Position": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "string" }  // fallback if your values are ISO-like without 'Z'
+      ]
+    },
     "SensorConnection": {
       "type": "object",
       "properties": {
         "sensorId": { "type": "string" },
-        "serviceType": { "type": "string" },
-        "linkToObservation": { "type": "string", "format": "uri-reference" },
-        "linkToSensor": { "type": "string", "format": "uri-reference" },
-        "cityObjectRef": {
-          "type": "string",
-          "description": "Optional: id of a CityObject representing the physical sensor."
-        },
+        "serviceType": { "type": "string", "enum": ["HTTP", "MQTT", "Other"] },
+        "sourceURL": { "type": "string", "format": "uri" },
+        "observationURL": { "type": "string", "format": "uri" },
         "position": {
           "type": "object",
-          "description": "Optional: sensor position in same CRS as the dataset.",
           "properties": {
             "x": { "type": "number" },
             "y": { "type": "number" },
             "z": { "type": "number" }
           },
-          "required": ["x", "y"],
+          "required": ["x","y","z"],
           "additionalProperties": false
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
         }
       },
+      "required": ["sensorId"],
       "additionalProperties": false
     },
-
-    "TM_Position": {
-      "type": "string",
-      "format": "date-time",
-      "description": "ISO 8601 timestamp, e.g. 2025-09-01T12:00:00Z"
-    },
-
     "Observation": {
       "type": "object",
       "properties": {
-        "time": { "type": "string", "format": "date-time" },
-        "value": { "type": "number" }
+        "time": { "$ref": "#/definitions/TM_Position" },
+        "value": { "type": "number" },
+        "uom": { "type": "string" }
       },
       "required": ["time", "value"],
       "additionalProperties": false
     },
-
-    "AtomicTimeseries": {
-      "type": "array",
-      "description": "Simple time–value pairs.",
-      "items": { "$ref": "#/definitions/Observation" },
-      "minItems": 1
-    },
-
-    "CompositeTimeseries": {
+    "ObservationsTimeseries": {
       "type": "object",
-      "description": "Compact series definition (base + spacing) for regular sampling.",
       "properties": {
-        "baseTime": { "type": "string", "format": "date-time" },
-        "spacing": {
-          "type": "string",
-          "description": "ISO 8601 duration, e.g. PT1H, PT5M, P1D"
+        "observations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Observation" },
+          "minItems": 1
         }
       },
-      "required": ["baseTime", "spacing"],
+      "required": ["observations"],
       "additionalProperties": false
     },
-
-    "TimeseriesComponent": {
+    "DynamizerAttachment": {
       "type": "object",
-      "description": "Optional repetition and gap parameters for composite series.",
       "properties": {
-        "repetitions": { "type": "integer", "minimum": 1 },
-        "additionalGap": {
-          "type": "string",
-          "description": "Optional ISO 8601 duration gap between repetitions."
-        },
-        "component": { "$ref": "#/definitions/CompositeTimeseries" }
+        "attributeRef": { "type": "string", "format": "uri-reference" },
+        "startTime": { "$ref": "#/definitions/TM_Position" },
+        "endTime": { "$ref": "#/definitions/TM_Position" },
+        "linkToSensor": { "$ref": "#/definitions/SensorConnection" },
+        "dynamicData": { "$ref": "#/definitions/ObservationsTimeseries" }
       },
-      "required": ["component"],
+      "required": ["attributeRef", "dynamicData"],
       "additionalProperties": false
-    },
-
-    "_AbstractTimeseries": {
-      "type": "object",
-      "description": "Either provide observations (array) or a composite definition (component), or both.",
-      "properties": {
-        "observations": { "$ref": "#/definitions/AtomicTimeseries" },
-        "timeseries":   { "$ref": "#/definitions/TimeseriesComponent" }
-      },
-      "additionalProperties": false,
-      "anyOf": [
-        { "required": ["observations"] },
-        { "required": ["timeseries"] }
-      ]
     }
   },
-
   "extraAttributes": {
     "Building": {
       "dynamizer": {
-        "type": "object",
-        "properties": {
-          "attributeRef": { "type": "string", "format": "uri-reference", "description": "JSON Pointer to the target attribute" },
-          "startTime": { "$ref": "#/definitions/TM_Position" },
-          "endTime":   { "$ref": "#/definitions/TM_Position" },
-          "linkToSensor": { "$ref": "#/definitions/SensorConnection" },
-          "dynamicData": { "$ref": "#/definitions/_AbstractTimeseries" }
-        },
-        "required": ["attributeRef", "dynamicData"],
-        "additionalProperties": false
+        "oneOf": [
+          { "$ref": "#/definitions/DynamizerAttachment" },
+          {
+            "type": "array",
+            "items": { "$ref": "#/definitions/DynamizerAttachment" },
+            "minItems": 1
+          }
+        ]
       }
     },
     "GenericCityObject": {
       "dynamizer": {
-        "type": "object",
-        "properties": {
-          "attributeRef": { "type": "string", "format": "uri-reference", "description": "JSON Pointer to the target attribute" },
-          "startTime": { "$ref": "#/definitions/TM_Position" },
-          "endTime":   { "$ref": "#/definitions/TM_Position" },
-          "linkToSensor": { "$ref": "#/definitions/SensorConnection" },
-          "dynamicData": { "$ref": "#/definitions/_AbstractTimeseries" }
-        },
-        "required": ["attributeRef", "dynamicData"],
-        "additionalProperties": false
+        "oneOf": [
+          { "$ref": "#/definitions/DynamizerAttachment" },
+          {
+            "type": "array",
+            "items": { "$ref": "#/definitions/DynamizerAttachment" },
+            "minItems": 1
+          }
+        ]
       }
     }
   },
-
   "extraCityObjects": {},
   "extraSemanticSurfaces": {},
   "extraRootProperties": {}
