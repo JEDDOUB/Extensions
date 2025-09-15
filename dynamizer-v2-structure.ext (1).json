@@ -2,172 +2,136 @@
   "$schema": "https://cityjson.org/schemas/cityjson-extension/1.0.0/CityJSONExtension.schema.json",
   "type": "CityJSONExtension",
   "name": "Dynamizer",
-  "url": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext%20(1).json",
+  "url": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext.json",
   "version": "2.0",
   "versionCityJSON": "2.0",
-  "description": "Extension for dynamic attribute modeling based on sensor input and time series",
+  "description": "Attach time-series sensor data to attributes of CityObjects (simple observations or composite series).",
+
   "definitions": {
     "SensorConnection": {
       "type": "object",
       "properties": {
-        "SensorId": {
-          "type": "string"
-        },
-        "serviceType": {
-          "type": "string"
-        },
-        "linkToObservation": {
+        "sensorId": { "type": "string" },
+        "serviceType": { "type": "string" },
+        "linkToObservation": { "type": "string", "format": "uri-reference" },
+        "linkToSensor": { "type": "string", "format": "uri-reference" },
+        "cityObjectRef": {
           "type": "string",
-          "format": "uri-reference"
+          "description": "Optional: id of a CityObject representing the physical sensor."
         },
-        "linkToSensor": {
-          "type": "string",
-          "format": "uri-reference"
-        },
-        "sensorLocation": {
-          "$ref": "cityobjects.schema.json#/_AbstractCityObject"
+        "position": {
+          "type": "object",
+          "description": "Optional: sensor position in same CRS as the dataset.",
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "z": { "type": "number" }
+          },
+          "required": ["x", "y"],
+          "additionalProperties": false
         }
-      }
+      },
+      "additionalProperties": false
     },
-    "dynamicDataDR": {
-      "$ref": "http://www.opengis.net/def/timeseriesType/timeseriesML/TimeseriesDomainRange"
+
+    "TM_Position": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp, e.g. 2025-09-01T12:00:00Z"
     },
-    "dynamicDataTVP": {
-      "$ref": "http://www.opengis.net/def/timeseriesType/timeseriesML/TimeseriesTimeValuePair"
-    },
-    "observationData": {
+
+    "Observation": {
       "type": "object",
       "properties": {
-        "time": {
-          "type": "string"
-        },
-        "value": {
-          "type": "number"
-        }
-      }
+        "time": { "type": "string", "format": "date-time" },
+        "value": { "type": "number" }
+      },
+      "required": ["time", "value"],
+      "additionalProperties": false
     },
+
     "AtomicTimeseries": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/dynamicDataDR"
-        },
-        {
-          "$ref": "#/definitions/dynamicDataTVP"
-        },
-        {
-          "$ref": "#/definitions/observationData"
-        }
-      ]
+      "type": "array",
+      "description": "Simple time–value pairs.",
+      "items": { "$ref": "#/definitions/Observation" },
+      "minItems": 1
     },
+
     "CompositeTimeseries": {
       "type": "object",
+      "description": "Compact series definition (base + spacing) for regular sampling.",
       "properties": {
-        "BaseTime": {
-          "type": "string"
-        },
+        "baseTime": { "type": "string", "format": "date-time" },
         "spacing": {
-          "type": "string"
+          "type": "string",
+          "description": "ISO 8601 duration, e.g. PT1H, PT5M, P1D"
         }
-      }
+      },
+      "required": ["baseTime", "spacing"],
+      "additionalProperties": false
     },
-    "timeseriesComponent": {
+
+    "TimeseriesComponent": {
       "type": "object",
+      "description": "Optional repetition and gap parameters for composite series.",
       "properties": {
-        "repetitions": {
-          "type": "integer"
-        },
+        "repetitions": { "type": "integer", "minimum": 1 },
         "additionalGap": {
-          "$ref": "http://www.opengis.net/def/objectType/ISO-19108/2002/TM_Period"
+          "type": "string",
+          "description": "Optional ISO 8601 duration gap between repetitions."
         },
-        "component": {
-          "$ref": "#/definitions/CompositeTimeseries"
-        }
-      }
+        "component": { "$ref": "#/definitions/CompositeTimeseries" }
+      },
+      "required": ["component"],
+      "additionalProperties": false
     },
+
     "_AbstractTimeseries": {
       "type": "object",
-      "oneOf": [
-        {
-          "$ref": "#/definitions/AtomicTimeseries"
-        },
-        {
-          "$ref": "#/definitions/CompositeTimeseries"
-        }
-      ],
+      "description": "Either provide observations (array) or a composite definition (component), or both.",
       "properties": {
-        "timeseries": {
-          "$ref": "#/definitions/timeseriesComponent"
-        }
-      }
-    },
-    "TM_Position": {
-      "oneOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "string",
-          "format": "date"
-        },
-        {
-          "type": "string",
-          "format": "time"
-        },
-        {
-          "type": "string",
-          "format": "date-time"
-        }
+        "observations": { "$ref": "#/definitions/AtomicTimeseries" },
+        "timeseries":   { "$ref": "#/definitions/TimeseriesComponent" }
+      },
+      "additionalProperties": false,
+      "anyOf": [
+        { "required": ["observations"] },
+        { "required": ["timeseries"] }
       ]
     }
   },
-"extraAttributes": {
-  "Building": {
-    "dynamizer": {
-      "type": "object",
-      "properties": {
-        "attributeRef": {
-          "type": "string",
-          "format": "uri-reference"
+
+  "extraAttributes": {
+    "Building": {
+      "dynamizer": {
+        "type": "object",
+        "properties": {
+          "attributeRef": { "type": "string", "format": "uri-reference", "description": "JSON Pointer to the target attribute" },
+          "startTime": { "$ref": "#/definitions/TM_Position" },
+          "endTime":   { "$ref": "#/definitions/TM_Position" },
+          "linkToSensor": { "$ref": "#/definitions/SensorConnection" },
+          "dynamicData": { "$ref": "#/definitions/_AbstractTimeseries" }
         },
-        "startTime": {
-          "$ref": "#/definitions/TM_Position"
+        "required": ["attributeRef", "dynamicData"],
+        "additionalProperties": false
+      }
+    },
+    "GenericCityObject": {
+      "dynamizer": {
+        "type": "object",
+        "properties": {
+          "attributeRef": { "type": "string", "format": "uri-reference", "description": "JSON Pointer to the target attribute" },
+          "startTime": { "$ref": "#/definitions/TM_Position" },
+          "endTime":   { "$ref": "#/definitions/TM_Position" },
+          "linkToSensor": { "$ref": "#/definitions/SensorConnection" },
+          "dynamicData": { "$ref": "#/definitions/_AbstractTimeseries" }
         },
-        "endTime": {
-          "$ref": "#/definitions/TM_Position"
-        },
-        "linkToSensor": {
-          "$ref": "#/definitions/SensorConnection"
-        },
-        "dynamicData": {
-          "$ref": "#/definitions/_AbstractTimeseries"
-        }
+        "required": ["attributeRef", "dynamicData"],
+        "additionalProperties": false
       }
     }
   },
-"GenericCityObject": {
-  "dynamizer": {
-    "type": "object",
-    "properties": {
-      "attributeRef": {
-        "type": "string",
-        "format": "uri-reference"
-      },
-      "startTime": {
-        "$ref": "#/definitions/TM_Position"
-      },
-      "endTime": {
-        "$ref": "#/definitions/TM_Position"
-      },
-      "linkToSensor": {
-        "$ref": "#/definitions/SensorConnection"
-      },
-      "dynamicData": {
-        "$ref": "#/definitions/_AbstractTimeseries"
-      }
-    }
-  }
-}
-  },
+
   "extraCityObjects": {},
   "extraSemanticSurfaces": {},
   "extraRootProperties": {}
