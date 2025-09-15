@@ -2,7 +2,7 @@
   "$schema": "https://cityjson.org/schemas/cityjson-extension/1.0.0/CityJSONExtension.schema.json",
   "type": "CityJSONExtension",
   "name": "Dynamizer",
-  "url": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext%20(1).json",
+  "url": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext.json",
   "version": "2.0",
   "versionCityJSON": "2.0",
   "description": "Attach dynamic time-series sensor data to CityJSON features (simple observations model).",
@@ -10,7 +10,7 @@
     "TM_Position": {
       "oneOf": [
         { "type": "string", "format": "date-time" },
-        { "type": "string" }  // fallback if your values are ISO-like without 'Z'
+        { "type": "string" }
       ]
     },
     "SensorConnection": {
@@ -27,12 +27,12 @@
             "y": { "type": "number" },
             "z": { "type": "number" }
           },
-          "required": ["x","y","z"],
+          "required": ["x", "y", "z"],
           "additionalProperties": false
         },
         "metadata": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": true"
         }
       },
       "required": ["sensorId"],
