@@ -9,14 +9,35 @@
   "extraRootProperties": {},
   "extraAttributes": {
     "CityFurniture": {
-      "+Dynamizer": { "$ref": "#/definitions/Dynamizer" }
+      "+Dynamizer": { "$ref": "#/definitions/DynamizerOrArray" }
     },
     "GenericCityObject": {
-      "+Dynamizer": { "$ref": "#/definitions/Dynamizer" }
+      "+Dynamizer": { "$ref": "#/definitions/DynamizerOrArray" }
     }
   },
   "extraCityObjects": {},
-  "extraSemanticSurfaces": {},
+  "extraSemanticSurfaces": {
+    "CityFurniture": {
+      "SensorMountSurface": {
+        "description": "Surface or patch where a sensor is mounted.",
+        "attributes": {
+          "mountType": { "type": "string", "enum": ["arm", "bracket", "pole", "wall", "other"] },
+          "exposure": { "type": "string", "enum": ["indoor", "outdoor"] },
+          "heightAboveGround_m": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "GenericCityObject": {
+      "SensorMountSurface": {
+        "description": "Surface or patch where a sensor is mounted.",
+        "attributes": {
+          "mountType": { "type": "string", "enum": ["arm", "bracket", "pole", "wall", "other"] },
+          "exposure": { "type": "string", "enum": ["indoor", "outdoor"] },
+          "heightAboveGround_m": { "type": "number", "minimum": 0 }
+        }
+      }
+    }
+  },
   "definitions": {
     "DateTime": {
       "type": "string",
@@ -31,16 +52,24 @@
       "minLength": 1,
       "description": "JSON Pointer-like path to the attribute being dynamized (e.g., 'attributes/NO2')."
     },
-
     "LinkObject": {
       "type": "object",
       "properties": {
         "uri": { "$ref": "#/definitions/URI" },
-        "format": { "type": "string" }
+        "format": { "type": "string" },
+        "headers": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Optional HTTP headers (e.g., Authorization: Bearer ...)."
+        },
+        "query": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "number", "boolean"] },
+          "description": "Optional query parameters to append to the URI."
+        }
       },
       "required": ["uri"]
     },
-
     "SensorConnection": {
       "type": "object",
       "properties": {
@@ -48,6 +77,7 @@
         "serviceType": { "type": "string", "description": "e.g., 'OGC SensorThings', 'REST', 'SOS', 'OpenAQ'." },
         "linkToObservation": { "$ref": "#/definitions/LinkObject" },
         "linkToSensorDescription": { "$ref": "#/definitions/LinkObject" },
+        "pollingIntervalSeconds": { "type": "integer", "minimum": 1 },
         "sensorLocation": {
           "type": "string",
           "description": "Optional hint about where the sensor sits (e.g., a related CityObject id/path)."
@@ -55,7 +85,6 @@
       },
       "required": ["linkToObservation"]
     },
-
     "TimeseriesTimeValuePair": {
       "type": "object",
       "properties": {
@@ -81,7 +110,6 @@
       },
       "required": ["type", "values"]
     },
-
     "TimeseriesDomainRange": {
       "type": "object",
       "properties": {
@@ -98,7 +126,6 @@
       },
       "required": ["type", "times", "values"]
     },
-
     "ObservationData": {
       "type": "object",
       "properties": {
@@ -110,7 +137,6 @@
       },
       "required": ["type"]
     },
-
     "DynamicData": {
       "oneOf": [
         { "$ref": "#/definitions/TimeseriesTimeValuePair" },
@@ -118,7 +144,6 @@
         { "$ref": "#/definitions/ObservationData" }
       ]
     },
-
     "Dynamizer": {
       "type": "object",
       "properties": {
@@ -140,6 +165,16 @@
       },
       "required": ["attributeRef", "startTime", "dynamicData"],
       "additionalProperties": false
+    },
+    "DynamizerOrArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/Dynamizer" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Dynamizer" },
+          "minItems": 1
+        }
+      ]
     }
   }
 }
