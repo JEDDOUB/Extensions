@@ -1,105 +1,145 @@
 {
-  "$schema": "https://cityjson.org/schemas/cityjson-extension/1.0.0/CityJSONExtension.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "CityJSONExtension",
   "name": "Dynamizer",
-  "url": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext.json",
-  "version": "2.0",
+  "uri": "https://example.org/extensions/dynamizer.ext.json",
+  "version": "1.1.0",
   "versionCityJSON": "2.0",
-  "description": "Attach dynamic time-series sensor data to CityJSON features (simple observations model).",
-  "definitions": {
-    "TM_Position": {
-      "oneOf": [
-        { "type": "string", "format": "date-time" },
-        { "type": "string" }
-      ]
-    },
-    "SensorConnection": {
-      "type": "object",
-      "properties": {
-        "sensorId": { "type": "string" },
-        "serviceType": { "type": "string", "enum": ["HTTP", "MQTT", "Other"] },
-        "sourceURL": { "type": "string", "format": "uri" },
-        "observationURL": { "type": "string", "format": "uri" },
-        "position": {
-          "type": "object",
-          "properties": {
-            "x": { "type": "number" },
-            "y": { "type": "number" },
-            "z": { "type": "number" }
-          },
-          "required": ["x", "y", "z"],
-          "additionalProperties": false
-        },
-        "metadata": {
-          "type": "object",
-          "additionalProperties": true"
-        }
-      },
-      "required": ["sensorId"],
-      "additionalProperties": false
-    },
-    "Observation": {
-      "type": "object",
-      "properties": {
-        "time": { "$ref": "#/definitions/TM_Position" },
-        "value": { "type": "number" },
-        "uom": { "type": "string" }
-      },
-      "required": ["time", "value"],
-      "additionalProperties": false
-    },
-    "ObservationsTimeseries": {
-      "type": "object",
-      "properties": {
-        "observations": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/Observation" },
-          "minItems": 1
-        }
-      },
-      "required": ["observations"],
-      "additionalProperties": false
-    },
-    "DynamizerAttachment": {
-      "type": "object",
-      "properties": {
-        "attributeRef": { "type": "string", "format": "uri-reference" },
-        "startTime": { "$ref": "#/definitions/TM_Position" },
-        "endTime": { "$ref": "#/definitions/TM_Position" },
-        "linkToSensor": { "$ref": "#/definitions/SensorConnection" },
-        "dynamicData": { "$ref": "#/definitions/ObservationsTimeseries" }
-      },
-      "required": ["attributeRef", "dynamicData"],
-      "additionalProperties": false
-    }
-  },
+  "description": "Associate time-varying IoT observations (e.g., air quality) to CityJSON attributes via +Dynamizer.",
+  "extraRootProperties": {},
   "extraAttributes": {
-    "Building": {
-      "dynamizer": {
-        "oneOf": [
-          { "$ref": "#/definitions/DynamizerAttachment" },
-          {
-            "type": "array",
-            "items": { "$ref": "#/definitions/DynamizerAttachment" },
-            "minItems": 1
-          }
-        ]
-      }
+    "CityFurniture": {
+      "+Dynamizer": { "$ref": "#/definitions/Dynamizer" }
     },
     "GenericCityObject": {
-      "dynamizer": {
-        "oneOf": [
-          { "$ref": "#/definitions/DynamizerAttachment" },
-          {
-            "type": "array",
-            "items": { "$ref": "#/definitions/DynamizerAttachment" },
-            "minItems": 1
-          }
-        ]
-      }
+      "+Dynamizer": { "$ref": "#/definitions/Dynamizer" }
     }
   },
   "extraCityObjects": {},
   "extraSemanticSurfaces": {},
-  "extraRootProperties": {}
+  "definitions": {
+    "DateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "URI": {
+      "type": "string",
+      "format": "uri"
+    },
+    "AttributeRef": {
+      "type": "string",
+      "minLength": 1,
+      "description": "JSON Pointer-like path to the attribute being dynamized (e.g., 'attributes/NO2')."
+    },
+
+    "LinkObject": {
+      "type": "object",
+      "properties": {
+        "uri": { "$ref": "#/definitions/URI" },
+        "format": { "type": "string" }
+      },
+      "required": ["uri"]
+    },
+
+    "SensorConnection": {
+      "type": "object",
+      "properties": {
+        "sensorId": { "type": "string" },
+        "serviceType": { "type": "string", "description": "e.g., 'OGC SensorThings', 'REST', 'SOS', 'OpenAQ'." },
+        "linkToObservation": { "$ref": "#/definitions/LinkObject" },
+        "linkToSensorDescription": { "$ref": "#/definitions/LinkObject" },
+        "sensorLocation": {
+          "type": "string",
+          "description": "Optional hint about where the sensor sits (e.g., a related CityObject id/path)."
+        }
+      },
+      "required": ["linkToObservation"]
+    },
+
+    "TimeseriesTimeValuePair": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "TimeseriesTimeValuePair" },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": [
+              { "$ref": "#/definitions/DateTime" },
+              { "type": "number" }
+            ]
+          }
+        },
+        "uom": { "type": "string" },
+        "interpolation": {
+          "type": "string",
+          "enum": ["step", "linear", "spline"],
+          "default": "step"
+        }
+      },
+      "required": ["type", "values"]
+    },
+
+    "TimeseriesDomainRange": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "TimeseriesDomainRange" },
+        "times": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/DateTime" }
+        },
+        "values": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "uom": { "type": "string" }
+      },
+      "required": ["type", "times", "values"]
+    },
+
+    "ObservationData": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "ObservationData" },
+        "observedProperty": { "type": "string", "description": "e.g., PM25, NO2, O3..." },
+        "uom": { "type": "string" },
+        "aggregation": { "type": "string", "description": "e.g., mean, max, min" },
+        "statistic": { "type": "string" }
+      },
+      "required": ["type"]
+    },
+
+    "DynamicData": {
+      "oneOf": [
+        { "$ref": "#/definitions/TimeseriesTimeValuePair" },
+        { "$ref": "#/definitions/TimeseriesDomainRange" },
+        { "$ref": "#/definitions/ObservationData" }
+      ]
+    },
+
+    "Dynamizer": {
+      "type": "object",
+      "properties": {
+        "attributeRef": { "$ref": "#/definitions/AttributeRef" },
+        "startTime": { "$ref": "#/definitions/DateTime" },
+        "endTime": {
+          "anyOf": [
+            { "$ref": "#/definitions/DateTime" },
+            { "type": "null" }
+          ]
+        },
+        "dynamicData": { "$ref": "#/definitions/DynamicData" },
+        "linkToSensor": { "$ref": "#/definitions/SensorConnection" },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Optional free-form metadata (QA/QC flags, provider, calibration, etc.)."
+        }
+      },
+      "required": ["attributeRef", "startTime", "dynamicData"],
+      "additionalProperties": false
+    }
+  }
 }
