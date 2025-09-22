@@ -39,14 +39,8 @@
     }
   },
   "definitions": {
-    "DateTime": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "URI": {
-      "type": "string",
-      "format": "uri"
-    },
+    "DateTime": { "type": "string", "format": "date-time" },
+    "URI": { "type": "string", "format": "uri" },
     "AttributeRef": {
       "type": "string",
       "minLength": 1,
@@ -114,14 +108,8 @@
       "type": "object",
       "properties": {
         "type": { "const": "TimeseriesDomainRange" },
-        "times": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/DateTime" }
-        },
-        "values": {
-          "type": "array",
-          "items": { "type": "number" }
-        },
+        "times": { "type": "array", "items": { "$ref": "#/definitions/DateTime" } },
+        "values": { "type": "array", "items": { "type": "number" } },
         "uom": { "type": "string" }
       },
       "required": ["type", "times", "values"]
