@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "CityJSONExtension",
   "name": "Dynamizer",
-  "uri": "https://example.org/extensions/dynamizer.ext.json",
+  "uri": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext.json",
   "version": "1.1.0",
   "versionCityJSON": "2.0",
   "description": "Associate time-varying IoT observations (e.g., air quality) to CityJSON attributes via +Dynamizer.",
