@@ -3,7 +3,7 @@
   "type": "CityJSONExtension",
   "name": "Dynamizer",
   "uri": "https://raw.githubusercontent.com/JEDDOUB/Extensions/refs/heads/main/dynamizer-v2-structure.ext.json",
-  "version": "1.1.0",
+  "version": "1.1",
   "versionCityJSON": "2.0",
   "description": "Associate time-varying IoT observations (e.g., air quality) to CityJSON attributes via +Dynamizer.",
   "extraRootProperties": {},
